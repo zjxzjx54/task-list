@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+//初始全局变量，主要是dpr和宽度
+$design-dpr：2;
+$design-width :750;
+
+//将px转换为vm
+@function px2vw($px) {
+  @return ( $px / $design-widthpx) * 100vw
+}
+
+
+
+
+/* 设置字体大小，不使用rem单位， 根据dpr值分段调整 */
+@mixin font-size($fontSize) {
+  font-size: $fontSize / $design-dpr;
+
+  [data-dpr="2"] & {
+    font-size: $fontSize / $design-dpr * 2;
+  }
+
+  [data-dpr="3"] & {
+    font-size: $fontSize / $design-dpr * 3;
+  }
+}

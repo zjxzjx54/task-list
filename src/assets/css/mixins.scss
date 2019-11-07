@@ -1,0 +1,11 @@
+@mixin setWidthAndHeight ($width,$height) {
+  width:$width;
+  height:$height;
+}
+
+@mixin flexContainer ($directionType:row,$justifyContent:flex-start,$alignItem:center) {
+  display:flex;
+  flex-direction:$directionType ;
+  justify-content: $justifyContent;
+  align-items: $alignItem;
+}
