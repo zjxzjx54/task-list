@@ -3,11 +3,13 @@ import React from 'react';
 import {Row,Col,Card, Icon,Input,Button,Modal, Form, Select, DatePicker}  from 'antd'
 import axios from "axios";
 import moment from 'moment'
+import {inject, observer} from "mobx-react";
 const {RangePicker } = DatePicker;
 const {Search} = Input;
 const {Option} = Select;
 
-
+@inject("userStore")
+@observer
 class ColumnContainerForm extends React.Component {
     constructor(props){
         super(props);
@@ -29,29 +31,20 @@ class ColumnContainerForm extends React.Component {
             modalVisibel:true
         })
     }
-    saveTask(type){
-        let currentType = "";
-        switch(type){
-            case "Process Task":
-                currentType = "process";
-                break;
-            case "Finished Task":
-                currentType = "finished";
-                break;
-            case "Timeout Task":
-                currentType = "timeout";
-                break;
-        }
+    saveTask = (e)=>{
+        e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            if (!err) {
-                const {title, tag,} = values;
+            if (err) {
+                console.log('Received values of form: ', values);
             } else {
-                const {email, password,rangeTime,note,status} = values;
-                axios.post("/login", {
-                    email, password
-                }).then(res => {
+                const {userId,token} = this.props.userStore.user;
+                axios.post("/api/task/add", {
+                    userId, ...values
+                },{headers:{'Authorization':token}}).then(res => {
+                    debugger;
                     if (res.data.success) {
                         this.setState({showUserNameTooltip: false, showPasswordTooltip: false});
+                        this.props.userStore.setUser(res.data.data);
                         this.props.history.push('/index/');
                     } else {
                         let $self = this;
@@ -139,10 +132,10 @@ class ColumnContainerForm extends React.Component {
                      }
                  </div>
                 <Modal
-                    title="Title"
+                    title="添加新任务"
                     visible={modalVisibel}
                     centered
-                    onOk={this.addTask}
+                    onOk={this.saveTask}
                     confirmLoading={confirmLoading}
                     onCancel={this.cancelAdd}
                 >
@@ -184,12 +177,12 @@ class ColumnContainerForm extends React.Component {
                         </Form.Item>
                         <Form.Item label="紧急程度">
                             {getFieldDecorator('status',{
-                                initialValue:"normal"
+                                initialValue:"1"
                             })(
                                 <Select  style={{ width: 120 }} >
-                                    <Option value="normal">普通</Option>
-                                    <Option value="lower">较低</Option>
-                                    <Option value="urgency">紧急</Option>
+                                    <Option value="1">普通</Option>
+                                    <Option value="0">较低</Option>
+                                    <Option value="2">紧急</Option>
                                 </Select>,
                             )}
                         </Form.Item>
@@ -199,5 +192,5 @@ class ColumnContainerForm extends React.Component {
         );
     }
 }
-const ColumnContainer = Form.create({name: 'normal_login'})(ColumnContainerForm);
+const ColumnContainer = Form.create({name: 'new_task'})(ColumnContainerForm);
 export default ColumnContainer

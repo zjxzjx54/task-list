@@ -2,6 +2,7 @@ import React from 'react'
 import {Form, Icon, Input, Button, Checkbox, Tooltip} from 'antd';
 import {Link} from 'react-router-dom'
 import axios from 'axios'
+import {inject, observer} from "mobx-react";
 
 const styles = {
     formLogin: {
@@ -17,7 +18,8 @@ const styles = {
     }
 
 };
-
+@inject("userStore")
+@observer
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -55,6 +57,7 @@ class Login extends React.Component {
                 }).then(res => {
                     if (res.data.success) {
                         this.setState({showUserNameTooltip: false, showPasswordTooltip: false});
+                        this.props.userStore.setUser(res.data.data);
                         this.props.history.push('/index/');
                     } else {
                         let $self = this;

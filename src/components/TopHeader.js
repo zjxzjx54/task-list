@@ -2,6 +2,7 @@ import React from 'react'
 import {Layout,Menu, Dropdown, Icon,Form, Input, Button,Select,DatePicker,Row,Col} from "antd";
 import moment from 'moment'
 import {Link} from "react-router-dom"
+import {inject, observer} from "mobx-react";
 const { Header} = Layout;
 const {Option} = Select;
 const menu = (
@@ -18,6 +19,9 @@ const menu = (
         </Menu.Item>
     </Menu>
 );
+
+@inject("userStore")
+@observer
 class TopHead extends React.Component {
     constructor(props){
         super(props);
@@ -40,6 +44,7 @@ class TopHead extends React.Component {
 
     render(){
         const { getFieldDecorator } = this.props.form;
+        const {username} = this.props.userStore.user;
         const formItemLayout = {
             labelCol: { span: 8},
             wrapperCol: { span: 14 },
@@ -76,7 +81,7 @@ class TopHead extends React.Component {
                     </Menu>
                     <Dropdown overlay={menu}>
                         <Button type="link" ghost>
-                            游客 <Icon type="down" />
+                            {username} <Icon type="down" />
                         </Button>
                     </Dropdown>
                 </div>

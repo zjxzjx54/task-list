@@ -2,8 +2,14 @@ import {observable, computed, action} from "mobx";
 
 export default class UserStore {
     @observable user = {
-        name:"游客",
-        id:-1,
-        token:null,
+        username:"zjxzjx",
+        email:"444138776@qq.com",
+        token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTczMjgzNDQ4LCJleHAiOjE1NzMyODcwNDh9.UKfOSUfwNBQB6EFJStMqAtHO9g-0UGKYm9mOCPMwdkY",
+        userId:1
     };
+
+    @action
+    setUser(user){
+        this.user = user
+    }
 }
