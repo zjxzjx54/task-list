@@ -15,6 +15,8 @@ import  './assets/css/base.css'
 import  './assets/css/main.scss'
 import { Provider } from "mobx-react";
 import rootStore from './mobx/index'
+import axios from 'axios'
+
 
 
 class App extends React.Component {
@@ -38,31 +40,5 @@ class App extends React.Component {
         )
     }
 }
-
-/*function App() {
-  return (
-    <div className="App">
-        <Provider {...store}>
-            <Header />
-            <BrowserRouter>
-                <Switch>
-                    <Route path="/login" component={Login}/>
-                    <Route path="/" component={
-                        <Mainlayout>
-                            <Route path="/" component={Home} />
-                            <Route path="/future" component={Future}/>
-                            <Route path="/history" component={History}/>
-                        </Mainlayout>
-                    }>
-
-                    </Route>
-
-                </Switch>
-            </BrowserRouter>
-            <Footer />
-        </Provider>
-    </div>
-  );
-}*/
 
 export default App;

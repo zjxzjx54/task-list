@@ -1,7 +1,7 @@
 import React from 'react'
 import {Form, Icon, Input, Button, Checkbox, Tooltip} from 'antd';
 import {Link} from 'react-router-dom'
-import axios from 'axios'
+import {GET,POST,setToken} from '../assets/js/http'
 import {inject, observer} from "mobx-react";
 
 const styles = {
@@ -18,7 +18,7 @@ const styles = {
     }
 
 };
-@inject("userStore")
+@inject("userStore","currentStore","finishStore")
 @observer
 class Login extends React.Component {
     constructor(props) {
@@ -52,12 +52,22 @@ class Login extends React.Component {
                 console.log('Received values of form: ', values);
             } else {
                 const {email, password} = values;
-                axios.post("/login", {
+                POST("/login", {
                     email, password
                 }).then(res => {
                     if (res.data.success) {
+                        setToken(res.data.data.token);
+                        debugger;
                         this.setState({showUserNameTooltip: false, showPasswordTooltip: false});
                         this.props.userStore.setUser(res.data.data);
+                        GET(`/api/task/get?uid=${res.data.data.userId}&type=process`)
+                            .then(res=>{
+                                this.props.currentStore.setTaskList(res.data.data);
+                            });
+                        GET(`/api/task/get?uid=${res.data.data.userId}&type=finish`)
+                            .then(res=>{
+                                this.props.finishStore.setTaskList(res.data.data);
+                            });
                         this.props.history.push('/index/');
                     } else {
                         let $self = this;

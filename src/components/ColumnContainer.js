@@ -37,11 +37,14 @@ class ColumnContainerForm extends React.Component {
             if (err) {
                 console.log('Received values of form: ', values);
             } else {
+                values = Object.assign({},values,{
+                    start_date:values.rangeTime[0].format('YYYY-MM-DD'),
+                    end_date:values.rangeTime[1].format('YYYY-MM-DD'),
+                })
                 const {userId,token} = this.props.userStore.user;
                 axios.post("/api/task/add", {
                     userId, ...values
                 },{headers:{'Authorization':token}}).then(res => {
-                    debugger;
                     if (res.data.success) {
                         this.setState({showUserNameTooltip: false, showPasswordTooltip: false});
                         this.props.userStore.setUser(res.data.data);
