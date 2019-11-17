@@ -8,8 +8,6 @@ class Index extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            processList:this.props.currentStore.currentTasks,
-            finishList:this.props.finishStore.finishTasks,
             timeoutList: [
                 {
                     title:'任务1',
@@ -25,12 +23,14 @@ class Index extends React.Component {
         }
     }
 
+
+
     render(){
 
         return (
             <div  className='main-layout'>
-                <ColumnContainer mode="muti" type="Process Task" tasksList={this.state.processList} />
-                <ColumnContainer mode="muti"  type="finished Task" tasksList={this.state.finishList} />
+                <ColumnContainer mode="muti" type="Process Task" tasksList={this.props.currentStore.currentTasks} />
+                <ColumnContainer mode="muti"  type="finished Task" tasksList={this.props.finishStore.finishTasks} />
                 <ColumnContainer mode="muti"  type="Timeout Task" tasksList={this.state.timeoutList} />
             </div>
         )

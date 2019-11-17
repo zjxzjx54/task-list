@@ -27,7 +27,7 @@ class App extends React.Component {
                     <Switch>
                         <Route exact path="/" component={LoginPage}/>
                         <Route  path="/" render={() =>
-                            <MainLayout>
+                            <MainLayout >
                                 <Route exact path="/index" component={Index}/>
                                 <Route exact path="/process" component={Process}/>
                                 <Route exact path="/finished" component={Finished}/>

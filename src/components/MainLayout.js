@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Layout}  from 'antd'
+import {withRouter} from 'react-router-dom'
 import TopHeader from './TopHeader'
 import BottomFooter from './BottomFooter'
 const { Header, Footer, Sider, Content } = Layout;
@@ -10,9 +11,10 @@ const { Header, Footer, Sider, Content } = Layout;
 
 
     render() {
+
         return (
             <div>
-                <TopHeader />
+                <TopHeader history={this.props.history} />
                 <Content >
                     {this.props.children}
                 </Content>
@@ -22,4 +24,4 @@ const { Header, Footer, Sider, Content } = Layout;
     }
 }
 
-export default MainLayout
+export default withRouter(MainLayout)

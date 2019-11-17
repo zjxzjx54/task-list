@@ -5,20 +5,7 @@ import {Link} from "react-router-dom"
 import {inject, observer} from "mobx-react";
 const { Header} = Layout;
 const {Option} = Select;
-const menu = (
-    <Menu>
-        <Menu.Item >
-            <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">
-                个人信息
-            </a>
-        </Menu.Item>
-        <Menu.Item>
-            <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">
-                退出登录
-            </a>
-        </Menu.Item>
-    </Menu>
-);
+
 
 @inject("userStore")
 @observer
@@ -27,11 +14,29 @@ class TopHead extends React.Component {
         super(props);
         this.state = {
             data:moment().format("YYYY-MM-DD"),
+            userMenu:(
+                <Menu onClick={this.clickMenu.bind(this)}>
+                    <Menu.Item key="self">
+            <span rel="noopener noreferrer" href="http://www.alipay.com/">
+                个人信息
+            </span>
+                    </Menu.Item>
+                    <Menu.Item key="loginOut">
+            <span rel="noopener noreferrer" >
+                退出登录
+            </span>
+                    </Menu.Item>
+                </Menu>),
         }
+        this.clickMenu = this.clickMenu.bind(this)
     }
-    selectUserMenu(e){
+    clickMenu = ({key})=>{
+        if(key === 'loginOut'){
+            this.props.history.push('/')
+        }
 
     }
+
 
     handleSubmit = e => {
         e.preventDefault();
@@ -42,6 +47,7 @@ class TopHead extends React.Component {
         });
     };
 
+
     render(){
         const { getFieldDecorator } = this.props.form;
         const {username} = this.props.userStore.user;
@@ -50,6 +56,7 @@ class TopHead extends React.Component {
             wrapperCol: { span: 14 },
         };
         const size = 'small';
+
         return (
             <Header className="zjx-header">
                 <div className="header-top">
@@ -79,7 +86,7 @@ class TopHead extends React.Component {
                             </Link>
                         </Menu.Item>
                     </Menu>
-                    <Dropdown overlay={menu}>
+                    <Dropdown overlay={this.state.userMenu}>
                         <Button type="link" ghost>
                             {username} <Icon type="down" />
                         </Button>

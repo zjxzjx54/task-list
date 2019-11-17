@@ -23,10 +23,15 @@ const styles = {
 class Login extends React.Component {
     constructor(props) {
         super(props);
+        let user = JSON.parse(localStorage.getItem("zjx-user"));
         this.state = {
             formModel: 'login',
             showUserNameTooltip: false,
             showPasswordTooltip: false,
+            originalUser:{
+                email:user ? user.email : "",
+                password:user ? user.password : "",
+        }
         };
 
         this.changeFormModel = (type) => {
@@ -44,6 +49,10 @@ class Login extends React.Component {
 
     }
 
+    componentDidMount(){
+
+    }
+
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
@@ -51,13 +60,17 @@ class Login extends React.Component {
                 console.log('err', err);
                 console.log('Received values of form: ', values);
             } else {
-                const {email, password} = values;
+                const {email, password,remember} = values;
+                if(remember){
+                    localStorage.setItem("zjx-user",JSON.stringify({
+                        email,password
+                    }))
+                }
                 POST("/login", {
                     email, password
                 }).then(res => {
                     if (res.data.success) {
                         setToken(res.data.data.token);
-                        debugger;
                         this.setState({showUserNameTooltip: false, showPasswordTooltip: false});
                         this.props.userStore.setUser(res.data.data);
                         GET(`/api/task/get?uid=${res.data.data.userId}&type=process`)
@@ -76,8 +89,9 @@ class Login extends React.Component {
                             this.setState({showUserNameTooltip: true})
                             :
                             this.setState({showPasswordTooltip: true})
-                        setTimeout(function () {
+                        let timer = setTimeout(function () {
                             $self.setState({showUserNameTooltip: false, showPasswordTooltip: false})
+                            clearTimeout(timer);
                         }, 2500)
 
                     }
@@ -89,10 +103,11 @@ class Login extends React.Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
+        const {email, password} = this.state.originalUser;
+
         return (
             <div id="container">
                 <div id="output" style={{height: '100vh', width: '100vw', position: 'relative'}}>
-
                     <div style={styles.formLogin}>
                         {
                             this.state.formModel === 'login' ?
@@ -107,6 +122,7 @@ class Login extends React.Component {
                                              title="用户名不对">
                                         <Form.Item>
                                             {getFieldDecorator('email', {
+                                                initialValue:email,
                                                 rules: [
                                                     {required: true, message: 'Please input your email!'},
                                                     {type: 'email', message: 'email format is incorrect!'},
@@ -123,6 +139,7 @@ class Login extends React.Component {
                                              visible={this.state.showPasswordTooltip} title="密码错误">
                                         <Form.Item>
                                             {getFieldDecorator('password', {
+                                                initialValue:password,
                                                 rules: [{required: true, message: 'Please input your Password!'}],
                                             })(
                                                 <Input

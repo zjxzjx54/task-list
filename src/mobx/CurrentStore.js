@@ -17,4 +17,5 @@ export default class CurrentStore {
     setTaskList(list){
         this.currentTasks = list;
     }
+
 }
