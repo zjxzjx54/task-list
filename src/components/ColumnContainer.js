@@ -10,7 +10,7 @@ const {RangePicker} = DatePicker;
 const {Search} = Input;
 const {Option} = Select;
 
-@inject("userStore", 'currentStore')
+@inject("userStore", 'currentStore',"finishStore","timeoutStore")
 @observer
 class ColumnContainerForm extends React.Component {
     constructor(props) {
@@ -22,6 +22,7 @@ class ColumnContainerForm extends React.Component {
             confirmModalVisibel:false,
             modalTitle:"添加新任务",
             currentTaskIndex:-1,
+            type:this.props.type,
         }
         this.showError = this.showError.bind(this);
     }
@@ -40,7 +41,6 @@ class ColumnContainerForm extends React.Component {
         })
     }
     updateTask(index){
-
         this.setState({
             modalVisibel: true,
             modalTitle:"更新任务",
@@ -122,12 +122,20 @@ class ColumnContainerForm extends React.Component {
     }
     deleteTask = (id) => {
         const {userId} = this.props.userStore.user;
+        let {type} = this.state;
         POST("/api/task/delete", {
             userId, taskId: id
         }).then(res => {
             if (res.data.success) {
                 //let oldTaskList = [].concat(this.props.currentStore.currentTasks);
-                this.props.currentStore.setTaskList(R.filter((item) => item.id !== id, this.props.currentStore.currentTasks))
+                if(type === 'Process Task'){
+                    this.props.currentStore.setTaskList(R.filter((item) => item.id !== id, this.props.currentStore.currentTasks))
+                }else if(type === 'Finish Task'){
+                    this.props.finishStore.setTaskList(R.filter((item) => item.id !== id, this.props.finishStore.finishTasks))
+                }else if(type === 'Timeout Task'){
+                    this.props.timeoutStore.setTaskList(R.filter((item) => item.id !== id, this.props.timeoutStore.timeoutTasks))
+                }
+
                 this.showNote(res.data.msg)
             } else {
                 this.showError(res.data.msg)
@@ -180,7 +188,7 @@ class ColumnContainerForm extends React.Component {
                                                    actions={[
                                                        <Icon type="select" key="setting"/>,
                                                        <Icon type="edit" onClick={() => this.updateTask(index)} key="edit"/>,
-                                                       <Icon type="delete" onClick={() => this.deleteTask(item.id)} key="ellipsis"/>,
+                                                       <Icon type="delete" onClick={() => this.showConfirm(item.id)} key="ellipsis"/>,
                                                    ]}>
                                                  <Card.Meta
                                                      title={item.title}
@@ -199,7 +207,7 @@ class ColumnContainerForm extends React.Component {
                                                    actions={[
                                                        <Icon type="select" key="setting"/>,
                                                        <Icon type="edit" onClick={() => this.updateTask(index)} key="edit"/>,
-                                                       <Icon type="delete" onClick={() => this.deleteTask(item.id)} key="ellipsis"/>,
+                                                       <Icon type="delete" onClick={() => this.showConfirm(item.id)} key="ellipsis"/>,
                                                    ]}>
                                                  <Card.Meta
                                                      title={item.title}

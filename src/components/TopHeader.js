@@ -3,11 +3,12 @@ import {Layout,Menu, Dropdown, Icon,Form, Input, Button,Select,DatePicker,Row,Co
 import moment from 'moment'
 import {Link} from "react-router-dom"
 import {inject, observer} from "mobx-react";
+import {POST} from "../assets/js/http";
 const { Header} = Layout;
 const {Option} = Select;
 
 
-@inject("userStore")
+@inject("userStore","currentStore","finishStore","timeoutStore")
 @observer
 class TopHead extends React.Component {
     constructor(props){
@@ -41,8 +42,28 @@ class TopHead extends React.Component {
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            if (!err) {
+            if (err) {
                 console.log('Received values of form: ', values);
+            }else{
+                let {type,start_date,end_date} = values;
+                start_date = moment(start_date).format("YYYY-MM-DD")
+                end_date = moment(end_date).format("YYYY-MM-DD")
+                const {userId} = this.props.userStore.user;
+                let data = {userId, type,start_date,end_date};
+                POST("/api/task/filter",data)
+                    .then(res=>{
+                        if(type === 'process'){
+                            this.props.currentStore.setTaskList(res.data.data.process);
+                        }else if(type === 'finished'){
+                            this.props.finishStore.setTaskList(res.data.data.finished);
+                        }else if(type === 'timeout'){
+                            this.props.timeoutStore.setTaskList(res.data.data.timeout);
+                        }else if(type === 'all'){
+                            this.props.currentStore.setTaskList(res.data.data.process);
+                            this.props.finishStore.setTaskList(res.data.data.finished);
+                            this.props.timeoutStore.setTaskList(res.data.data.timeout);
+                        }
+                    })
             }
         });
     };
@@ -97,17 +118,24 @@ class TopHead extends React.Component {
                         <Row>
                             <Col span={5}>
                                 <Form.Item {...formItemLayout} label="任务类型">
-                                    <Select size={size} placeholder="请选择任务类型">
-                                        <Option value="future">将来任务</Option>
-                                        <Option value="finished">已经完成任务</Option>
-                                        <Option value="process">未完成任务</Option>
-                                        <Option value="all">所有任务</Option>
-                                    </Select>
+                                    {getFieldDecorator('type',{
+                                        initialValue: "process",
+                                    })(
+                                        <Select size={size} placeholder="请选择任务类型">
+                                            <Option value="process">正在完成</Option>
+                                            <Option value="finished">已经完成任务</Option>
+                                            <Option value="timeout">超时任务</Option>
+                                            <Option value="all">所有任务</Option>
+                                        </Select>
+                                    )}
+
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
                                 <Form.Item {...formItemLayout} label="标题" >
-                                    <Input size={size} />
+                                    {getFieldDecorator('title')(
+                                        <Input size={size} />
+                                    )}
                                 </Form.Item>
                             </Col>
                             <Col span={10}>
@@ -115,17 +143,26 @@ class TopHead extends React.Component {
                                     <Form.Item
                                         style={{ display: 'inline-block', width: 'calc(45% - 12px)' }}
                                     >
-                                        <DatePicker size={size} />
+                                        {getFieldDecorator('start_date',{
+                                            initialValue: moment(),
+                                        })(
+                                            <DatePicker size={size}  format="YYYY-MM-DD"/>
+                                        )}
+
                                     </Form.Item>
                                     <span style={{ display: 'inline-block', width: '24px', textAlign: 'center',color:'#ffffff',fontWeight:700, }}>--</span>
                                     <Form.Item style={{ display: 'inline-block', width: 'calc(45% - 12px)' }}>
-                                        <DatePicker size={size}/>
+                                        {getFieldDecorator('end_date',{
+                                            initialValue: moment(),
+                                        })(
+                                            <DatePicker size={size}  format="YYYY-MM-DD"/>
+                                        )}
                                     </Form.Item>
                                 </Form.Item>
                             </Col>
                             <Col span={2}>
                                 <Form.Item>
-                                    <Button size={size} ghost>
+                                    <Button size={size} ghost htmlType="submit">
                                         Search
                                     </Button>
                                 </Form.Item>
