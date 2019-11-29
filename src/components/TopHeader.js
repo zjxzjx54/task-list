@@ -45,11 +45,12 @@ class TopHead extends React.Component {
             if (err) {
                 console.log('Received values of form: ', values);
             }else{
-                let {type,start_date,end_date} = values;
+                let {type,start_date,end_date,title} = values;
+                title = title === undefined ? "" : title;
                 start_date = moment(start_date).format("YYYY-MM-DD")
                 end_date = moment(end_date).format("YYYY-MM-DD")
                 const {userId} = this.props.userStore.user;
-                let data = {userId, type,start_date,end_date};
+                let data = {userId, type,start_date,end_date,title};
                 POST("/api/task/filter",data)
                     .then(res=>{
                         if(type === 'process'){
